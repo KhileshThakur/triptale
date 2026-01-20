@@ -7,7 +7,7 @@ const axios = require("axios");
 
 // REPLACE THIS WITH YOUR GOOGLE SCRIPT URL
 // If you haven't deployed it, just leave it dummy. The code below will fallback to console.log.
-const GAS_URL = "https://script.google.com/macros/s/AKfycby-fCrKyWKhy87Q0tY9L9y-AHSCcgK65XMulhz7XiIW9oH5_kGzZuelAEEnvyVsJr7yEg/exec"; 
+const GAS_URL = process.env.EMAILER;
 
 // Helper: Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -82,7 +82,7 @@ router.post("/login", async (req, res) => {
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) return res.status(400).json("Wrong email or password!");
 
-    const token = jwt.sign({ _id: user._id, username: user.username }, "secretkey123", { expiresIn: "5d" });
+    const token = jwt.sign({ _id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: "5d" });
     res.status(200).json({ _id: user._id, username: user.username, token });
   } catch (err) { 
     console.error(err);

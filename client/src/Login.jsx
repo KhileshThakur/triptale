@@ -3,6 +3,8 @@ import { FaTimes } from "react-icons/fa";
 import axios from "axios";
 import "./index.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Login({ setShowLogin, myStorage, setCurrentUser, openForgot }) {
   const [error, setError] = useState(false);
   const emailRef = useRef();
@@ -16,8 +18,9 @@ export default function Login({ setShowLogin, myStorage, setCurrentUser, openFor
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/api/users/login", userPayload);
-      
+    
+      const res = await axios.post(`${API_URL}/api/users/login`, userPayload);
+
       // 1. Save Data (Token + Username)
       myStorage.setItem("user", res.data.username);
       myStorage.setItem("token", res.data.token); 

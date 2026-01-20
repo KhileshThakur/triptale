@@ -3,6 +3,8 @@ import { FaTimes } from "react-icons/fa";
 import axios from "axios";
 import "./index.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function UpdatePassword({ onClose, currentUser }) {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -11,7 +13,7 @@ export default function UpdatePassword({ onClose, currentUser }) {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/users/update-password", {
+      await axios.post(`${API_URL}/api/users/update-password`, {
         username: currentUser,
         oldPassword,
         newPassword

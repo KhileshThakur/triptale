@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaTimes, FaCamera, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 
-const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/ddzua6arv/image/upload";
-const UPLOAD_PRESET = "triptale_preset";
+const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
+const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 
 const AddTripForm = ({ newLocation, onClose, onSaveSuccess }) => {
   // Initial State Definition
@@ -83,7 +83,7 @@ const AddTripForm = ({ newLocation, onClose, onSaveSuccess }) => {
           rating: isBucketList ? null : formData.rating 
       };
 
-      await axios.post('http://localhost:5000/api/places', payload);
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/places`, payload);
       
       // --- SUCCESS: RESET EVERYTHING ---
       setUploading(false);

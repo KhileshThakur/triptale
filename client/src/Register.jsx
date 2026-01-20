@@ -3,6 +3,8 @@ import { FaTimes, FaArrowLeft } from "react-icons/fa";
 import axios from "axios";
 import "./index.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Register({ setShowRegister }) {
   const [step, setStep] = useState(1); // 1 = Details, 2 = OTP
   const [error, setError] = useState(false);
@@ -30,9 +32,7 @@ export default function Register({ setShowRegister }) {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:5000/api/users/send-otp", { 
-        email: formData.email 
-      });
+await axios.post(`${API_URL}/api/users/send-otp`, { email: formData.email });        email: formData.email 
       setStep(2);
       setMsg("OTP sent to your email!");
     } catch (err) {
@@ -58,8 +58,7 @@ export default function Register({ setShowRegister }) {
         otp: formData.otp
       };
       
-      await axios.post("http://localhost:5000/api/users/register", newUser);
-      
+await axios.post(`${API_URL}/api/users/register`, newUser);      
       alert("Registration Successful! Please Login.");
       setShowRegister(false); 
 

@@ -3,6 +3,8 @@ import { FaTimes } from "react-icons/fa";
 import axios from "axios";
 import "./index.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function ForgotPassword({ onClose }) {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
@@ -13,7 +15,7 @@ export default function ForgotPassword({ onClose }) {
   const handleSendOtp = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/users/forgot-password", { email });
+      await axios.post(`${API_URL}/api/users/forgot-password`, { email });
       setStep(2);
       setMsg("OTP Sent!");
     } catch (err) { setMsg("User not found!"); }
@@ -22,7 +24,7 @@ export default function ForgotPassword({ onClose }) {
   const handleReset = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/users/reset-password", { email, otp, newPassword });
+      await axios.post(`${API_URL}/api/users/reset-password`, { email, otp, newPassword });
       alert("Password Reset Successful! Please Login.");
       onClose();
     } catch (err) { setMsg("Invalid OTP"); }

@@ -13,6 +13,8 @@ import Register from './Register';
 import ForgotPassword from './ForgotPassword';
 import UpdatePassword from './UpdatePassword';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // ==========================================
 // 1. CUSTOM MARKERS
 // ==========================================
@@ -151,9 +153,8 @@ function App() {
     try {
       // If logged in, fetch MY pins. If not, fetch nothing (or public pins)
       const url = currentUser
-        ? `http://localhost:5000/api/places?username=${currentUser}`
-        : 'http://localhost:5000/api/places'; // For now fetch all or empty
-
+        ? `${API_URL}/api/places?username=${currentUser}`
+        : `${API_URL}/api/places`;
       const res = await axios.get(url);
       setPlaces(res.data);
     } catch (err) { console.error(err); }

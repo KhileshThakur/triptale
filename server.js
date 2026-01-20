@@ -14,6 +14,13 @@ const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(cors());
+app.use(express.json());
+
+// Allow all origins for the first deploy (We will lock this down later)
+app.use(cors({
+    origin: "*", 
+    credentials: true
+}));
 
 // 2. USE ROUTES
 app.use('/api/places', placeRoute);
