@@ -5,7 +5,7 @@ import axios from 'axios';
 // Constants
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
-const API_URL = import.meta.env.VITE_API_URL; // Get from Env
+const API_URL = import.meta.env.VITE_API_URL || ""; // Get from Env
 
 const Sidebar = ({ place, onClose, onUpdateMap }) => {
     const [isEditing, setIsEditing] = useState(false);

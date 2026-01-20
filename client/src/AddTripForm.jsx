@@ -4,6 +4,7 @@ import { FaTimes, FaCamera, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
+const API_URL = import.meta.env.VITE_API_URL || ""
 
 const AddTripForm = ({ newLocation, onClose, onSaveSuccess }) => {
   // Initial State Definition
@@ -83,7 +84,7 @@ const AddTripForm = ({ newLocation, onClose, onSaveSuccess }) => {
           rating: isBucketList ? null : formData.rating 
       };
 
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/places`, payload);
+      await axios.post(`${API_URL}/api/places`, payload);
       
       // --- SUCCESS: RESET EVERYTHING ---
       setUploading(false);

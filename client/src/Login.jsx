@@ -3,7 +3,7 @@ import { FaTimes } from "react-icons/fa";
 import axios from "axios";
 import "./index.css";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 export default function Login({ setShowLogin, myStorage, setCurrentUser, openForgot }) {
   const [error, setError] = useState(false);

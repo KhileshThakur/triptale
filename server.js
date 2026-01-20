@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
@@ -15,6 +16,8 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors());
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, "/client/dist")));
 
 // Allow all origins for the first deploy (We will lock this down later)
 app.use(cors({

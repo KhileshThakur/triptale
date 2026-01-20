@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
+    "build": "npm install && cd client && npm install && npm run build",
     "dev": "nodemon server.js"
   },
   "keywords": [],
@@ -19,7 +20,8 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.4",
-    "nodemailer": "^7.0.12"
+    "nodemailer": "^7.0.12",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

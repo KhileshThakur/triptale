@@ -13,7 +13,7 @@ import Register from './Register';
 import ForgotPassword from './ForgotPassword';
 import UpdatePassword from './UpdatePassword';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 // ==========================================
 // 1. CUSTOM MARKERS
