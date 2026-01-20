@@ -1,26 +1,32 @@
 import { useState, useRef } from "react";
-import { FaMapMarkerAlt, FaTimes } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 import axios from "axios";
-import "./index.css"; // Reuse your css
+import "./index.css";
 
-export default function Login({ setShowLogin, myStorage, setCurrentUser }) {
+export default function Login({ setShowLogin, myStorage, setCurrentUser, openForgot }) {
   const [error, setError] = useState(false);
-  const nameRef = useRef();
+  const emailRef = useRef();
   const passwordRef = useRef();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = {
-      username: nameRef.current.value,
+    const userPayload = {
+      email: emailRef.current.value,
       password: passwordRef.current.value,
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/api/users/login", user);
+      const res = await axios.post("http://localhost:5000/api/users/login", userPayload);
+      
+      // 1. Save Data (Token + Username)
       myStorage.setItem("user", res.data.username);
+      myStorage.setItem("token", res.data.token); 
       setCurrentUser(res.data.username);
+      
+      // 2. Reset & Close
       setShowLogin(false);
       setError(false);
+      
     } catch (err) {
       setError(true);
     }
@@ -43,11 +49,21 @@ export default function Login({ setShowLogin, myStorage, setCurrentUser }) {
         </div>
 
         <form onSubmit={handleSubmit} style={{display:'flex', flexDirection:'column', gap:'15px'}}>
-          <input type="text" placeholder="Username" ref={nameRef} required />
+          <input type="email" placeholder="Email" ref={emailRef} required />
           <input type="password" placeholder="Password" ref={passwordRef} required />
-          <button className="btn-add" style={{width:'100%', justifyContent:'center', marginTop:'10px'}}>Login</button>
           
-          {error && <span style={{color:'red', fontSize:'0.8rem', textAlign:'center'}}>Something went wrong!</span>}
+          <div style={{textAlign:'right'}}>
+            <span 
+                onClick={() => { setShowLogin(false); openForgot(); }} 
+                style={{fontSize:'0.8rem', color:'#FF4757', cursor:'pointer', fontWeight: 600}}
+            >
+                Forgot Password?
+            </span>
+          </div>
+
+          <button className="btn-add" style={{width:'100%', justifyContent:'center', marginTop:'5px'}}>Login</button>
+          
+          {error && <span style={{color:'red', fontSize:'0.8rem', textAlign:'center'}}>Wrong email or password!</span>}
         </form>
         
         <FaTimes 
