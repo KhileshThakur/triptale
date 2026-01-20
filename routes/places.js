@@ -1,25 +1,27 @@
-const router = require('express').Router();
-const Place = require('../models/Place');
+const router = require("express").Router();
+const Place = require("../models/Place");
 
-// 1. POST: Create a new Place (Save a memory)
-router.post('/', async (req, res) => {
+// CREATE PIN
+router.post("/", async (req, res) => {
   const newPlace = new Place(req.body);
   try {
     const savedPlace = await newPlace.save();
     res.status(200).json(savedPlace);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+  } catch (err) { res.status(500).json(err); }
 });
 
-// 2. GET: Get all Places (Load the map pins)
-router.get('/', async (req, res) => {
+// GET PINS (Filter by username if provided in query)
+router.get("/", async (req, res) => {
   try {
-    const places = await Place.find();
+    const username = req.query.username;
+    let places;
+    if(username) {
+        places = await Place.find({ username: username }); // Only my pins
+    } else {
+        places = await Place.find(); // All pins (optional)
+    }
     res.status(200).json(places);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+  } catch (err) { res.status(500).json(err); }
 });
 
 // 3. DELETE: Delete a place

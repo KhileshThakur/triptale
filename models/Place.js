@@ -1,27 +1,23 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const PlaceSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: String,
-  status: {
-    type: String,
-    enum: ['visited', 'bucket-list'],
-    default: 'visited'
+const PlaceSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true }, // <--- NEW FIELD
+    title: { type: String, required: true, min: 3 },
+    description: { type: String, required: true, min: 3 },
+    rating: { type: Number, min: 0, max: 5 },
+    location: {
+        lat: { type: Number, required: true },
+        lng: { type: Number, required: true }
+    },
+    status: { type: String, enum: ['visited', 'bucket-list'], default: 'visited' },
+    visitDate: { type: Date },
+    images: [{
+        url: String,
+        caption: String
+    }]
   },
-  location: {
-    lat: { type: Number, required: true },
-    lng: { type: Number, required: true }
-  },
-  visitDate: Date,
-  rating: { type: Number, min: 1, max: 5 }, // Added Rating
-  
-  // UPGRADE: Support multiple images with captions
-  images: [
-    {
-      url: String,
-      caption: String
-    }
-  ]
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Place', PlaceSchema);
+module.exports = mongoose.model("Place", PlaceSchema);
