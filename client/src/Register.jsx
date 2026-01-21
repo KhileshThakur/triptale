@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaTimes, FaArrowLeft } from "react-icons/fa";
 import axios from "axios";
 import "./index.css";
+import Loader from './Loader';
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -78,8 +79,18 @@ await axios.post(`${API_URL}/api/users/register`, newUser);
     }}>
       <div style={{
           width: '320px', padding: '30px', background: 'white', 
-          borderRadius: '24px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)', position: 'relative'
+          borderRadius: '24px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)', position: 'relative', overflow: 'hidden'
       }}>
+        {loading && (
+            <div style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', 
+                background: 'rgba(255,255,255,0.95)', zIndex: 100, 
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+                <Loader text={step === 1 ? "Sending OTP..." : "Verifying..."} fullScreen={false} />
+            </div>
+        )}
+
         <div style={{textAlign:'center', marginBottom:'20px'}}>
             <div className="logo" style={{justifyContent:'center'}}>TripTale.</div>
             <span style={{color:'#777'}}>Create Account</span>

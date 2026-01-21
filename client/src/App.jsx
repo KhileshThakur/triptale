@@ -12,6 +12,7 @@ import Login from './Login';
 import Register from './Register';
 import ForgotPassword from './ForgotPassword';
 import UpdatePassword from './UpdatePassword';
+import Loader from './Loader';
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -82,51 +83,45 @@ const MapController = ({ searchResult, userLocation, triggerLocate, setTriggerLo
   return null;
 };
 
-// --- UPDATED HANDLER: ROBUST REVERSE GEOCODING ---
-// --- ROBUST REVERSE GEOCODING ---
-function MapEventsHandler({ setNewLocation, setSelectedPlace }) {
+// --- UPDATED HANDLER: FIX FOR DOUBLE CLICK ---
+function MapEventsHandler({ setNewLocation, setSelectedPlace, currentUser }) {
   useMapEvents({
     dblclick: async (e) => {
+      // 1. Check Auth First (This fixes the "Logged Out" issue)
       if (!currentUser) {
         alert("Please login to add a trip!");
         return; 
       }
 
+      // 2. Proceed if Logged In
       const { lat, lng } = e.latlng;
-
-      // 1. Immediate Feedback
       setNewLocation({ lat, lng, address: "Locating..." });
       setSelectedPlace(null);
 
       try {
-        // 2. Fetch with more specific params
         const res = await axios.get(
           `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-          { headers: { 'Accept-Language': 'en-US,en;q=0.9' } } // Try to force English
+          { headers: { 'Accept-Language': 'en-US,en;q=0.9' } }
         );
-
+        
         const data = res.data;
         let finalAddress = "";
 
         if (data.display_name) {
-          // Use the full fancy name if available
           finalAddress = data.display_name;
         } else if (data.address) {
-          // Fallback: Construct it manually if display_name is missing
           const { city, town, village, country } = data.address;
           finalAddress = [city || town || village, country].filter(Boolean).join(", ");
         }
 
-        // 3. Update State
-        setNewLocation({
-          lat,
-          lng,
-          address: finalAddress || "Address not found" // Fallback string instead of null
+        setNewLocation({ 
+          lat, 
+          lng, 
+          address: finalAddress || "Address not found" 
         });
 
       } catch (err) {
         console.error("Geocoding Error:", err);
-        // On error, show generic text so user knows we tried
         setNewLocation({ lat, lng, address: "Unknown Location" });
       }
     },
@@ -140,12 +135,12 @@ function MapEventsHandler({ setNewLocation, setSelectedPlace }) {
 function App() {
   const myStorage = window.localStorage;
   const [currentUser, setCurrentUser] = useState(myStorage.getItem("user"));
-
-  // Auth Modal States
+  const [loading, setLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
   const [showUpdatePass, setShowUpdatePass] = useState(false);
+  
   const [places, setPlaces] = useState([]);
   const [newLocation, setNewLocation] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -155,21 +150,31 @@ function App() {
   const [currentLayer, setCurrentLayer] = useState('streets');
 
   const fetchPlaces = async () => {
+    setLoading(true); 
     try {
-      // If logged in, fetch MY pins. If not, fetch nothing (or public pins)
       const url = currentUser
         ? `${API_URL}/api/places?username=${currentUser}`
         : `${API_URL}/api/places`;
-      const res = await axios.get(url);
+
+      // Wait for BOTH data and 3 seconds
+      const fetchPromise = axios.get(url);
+      const timerPromise = new Promise(resolve => setTimeout(resolve, 3000));
+
+      const [res] = await Promise.all([fetchPromise, timerPromise]);
+
       setPlaces(res.data);
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      console.error(err); 
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { fetchPlaces(); }, [currentUser]); // Refetch when user changes
+  useEffect(() => { fetchPlaces(); }, [currentUser]);
 
   const handleLogout = () => {
     myStorage.removeItem("user");
-    myStorage.removeItem("token"); // Clears the JWT
+    myStorage.removeItem("token");
     setCurrentUser(null);
     setPlaces([]);
   };
@@ -186,14 +191,14 @@ function App() {
 
   return (
     <div style={{ height: '100vh', width: '100vw', position: 'relative', overflow: 'hidden' }}>
+      
+      {loading && <Loader text="Exploring the world..." />}
 
       <Navbar
         onSearch={handleSearch}
         onAddClick={() => currentUser ? alert("Double click map!") : setShowLogin(true)}
         onLocateClick={() => setTriggerLocate(true)}
         currentLayer={currentLayer} setLayer={setCurrentLayer}
-
-        // Auth Props
         currentUser={currentUser}
         onLogout={handleLogout}
         onLoginClick={() => setShowLogin(true)}
@@ -211,28 +216,24 @@ function App() {
       {showRegister && <Register setShowRegister={setShowRegister} />}
       {showForgot && <ForgotPassword onClose={() => setShowForgot(false)} />}
       {showUpdatePass && <UpdatePassword onClose={() => setShowUpdatePass(false)} currentUser={currentUser} />}
-        
+
       <MapContainer
         center={[20, 0]} zoom={3} scrollWheelZoom={true} doubleClickZoom={false}
         style={{ height: "100%", width: "100%", zIndex: 0 }} zoomControl={false}
       >
         <MapController searchResult={searchResult} userLocation={userPos} triggerLocate={triggerLocate} setTriggerLocate={setTriggerLocate} onUserLocationFound={setUserPos} />
-        {currentUser && <MapEventsHandler setNewLocation={setNewLocation} setSelectedPlace={setSelectedPlace} currentUser={currentUser}/>}
-        {/* --- TILE LAYERS (Directly rendered based on state, no LayersControl) --- */}
+        
+        {/* --- FIXED: Always Render Handler, Pass currentUser --- */}
+        <MapEventsHandler 
+            setNewLocation={setNewLocation} 
+            setSelectedPlace={setSelectedPlace} 
+            currentUser={currentUser} 
+        />
+        
         {currentLayer === 'streets' ? (
-          <TileLayer
-            url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
-            maxZoom={20}
-            subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-            attribution='&copy; Google Maps'
-          />
+          <TileLayer url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}" maxZoom={20} subdomains={['mt0', 'mt1', 'mt2', 'mt3']} attribution='&copy; Google Maps' />
         ) : (
-          <TileLayer
-            url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
-            maxZoom={20}
-            subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-            attribution='&copy; Google Maps'
-          />
+          <TileLayer url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" maxZoom={20} subdomains={['mt0', 'mt1', 'mt2', 'mt3']} attribution='&copy; Google Maps' />
         )}
 
         {places.map((p) => (

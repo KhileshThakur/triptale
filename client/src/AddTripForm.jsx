@@ -5,6 +5,7 @@ import { FaTimes, FaCamera, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 const API_URL = import.meta.env.VITE_API_URL || ""
+import Loader from './Loader';
 
 const AddTripForm = ({ newLocation, onClose, onSaveSuccess }) => {
   // Initial State Definition
@@ -106,6 +107,15 @@ const AddTripForm = ({ newLocation, onClose, onSaveSuccess }) => {
 
   return (
     <div className={`sidebar-panel add-sidebar ${newLocation ? 'open' : ''}`}>
+        {uploading && (
+        <div style={{
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', 
+            background: 'rgba(255,255,255,0.9)', zIndex: 200, 
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+            <Loader text="Pinning memory..." fullScreen={false} />
+        </div>
+      )}
       <button className="close-btn" onClick={onClose}><FaTimes /></button>
       
       <div className="form-container">

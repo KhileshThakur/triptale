@@ -1,0 +1,121 @@
+/* CONTAINER LAYOUTS */
+.loader-container.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.85); /* Semi-transparent white */
+  backdrop-filter: blur(5px); /* Modern blur effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loader-container.inline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* --- EARTH & PIN GROUP --- */
+.earth-pin-group {
+  position: relative;
+  width: 80px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* 🌍 EARTH STYLE */
+.loader-earth {
+  font-size: 48px;
+  color: #3498db; /* Your Brand Blue */
+  z-index: 1;
+  /* Rotate the earth slowly */
+  animation: spinEarth 4s linear infinite;
+  background: white;
+  border-radius: 50%; /* Ensures background stays behind icon */
+}
+
+/* 📍 PIN STYLE */
+.loader-pin {
+  font-size: 40px;
+  color: #ff4757; /* Marker Red */
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  /* Bounce Animation */
+  animation: bouncePin 1.2s ease-in-out infinite;
+  filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.2));
+}
+
+/* 🌑 SHADOW STYLE */
+.loader-shadow {
+  width: 20px;
+  height: 6px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 2px;
+  z-index: 0;
+  animation: shadowPulse 1.2s ease-in-out infinite;
+}
+
+/* 📝 TEXT STYLE */
+.loader-text {
+  font-size: 1rem;
+  color: #555;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  animation: fadeText 1.5s ease-in-out infinite alternate;
+  margin: 0;
+}
+
+/* --- KEYFRAMES --- */
+
+/* 1. Pin Bouncing */
+@keyframes bouncePin {
+  0%, 100% {
+    transform: translateY(-30px); /* Up */
+  }
+  50% {
+    transform: translateY(-2px) scaleY(0.9); /* Down & Squash */
+  }
+}
+
+/* 2. Earth Spinning */
+@keyframes spinEarth {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 3. Shadow Growing/Shrinking */
+@keyframes shadowPulse {
+  0%, 100% {
+    transform: scale(0.5);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+/* 4. Text Pulsing */
+@keyframes fadeText {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
