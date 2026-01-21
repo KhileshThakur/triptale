@@ -32,7 +32,7 @@ export default function Register({ setShowRegister }) {
     setLoading(true);
 
     try {
-await axios.post(`${API_URL}/api/users/send-otp`, { email: formData.email });        email: formData.email 
+      await axios.post(`${API_URL}/api/users/send-otp`, { email: formData.email, username: formData.username });
       setStep(2);
       setMsg("OTP sent to your email!");
     } catch (err) {

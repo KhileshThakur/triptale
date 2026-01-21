@@ -87,6 +87,11 @@ const MapController = ({ searchResult, userLocation, triggerLocate, setTriggerLo
 function MapEventsHandler({ setNewLocation, setSelectedPlace }) {
   useMapEvents({
     dblclick: async (e) => {
+      if (!currentUser) {
+        alert("Please login to add a trip!");
+        return; 
+      }
+
       const { lat, lng } = e.latlng;
 
       // 1. Immediate Feedback
@@ -212,7 +217,7 @@ function App() {
         style={{ height: "100%", width: "100%", zIndex: 0 }} zoomControl={false}
       >
         <MapController searchResult={searchResult} userLocation={userPos} triggerLocate={triggerLocate} setTriggerLocate={setTriggerLocate} onUserLocationFound={setUserPos} />
-        {currentUser && <MapEventsHandler setNewLocation={setNewLocation} setSelectedPlace={setSelectedPlace} />}
+        {currentUser && <MapEventsHandler setNewLocation={setNewLocation} setSelectedPlace={setSelectedPlace} currentUser={currentUser}/>}
         {/* --- TILE LAYERS (Directly rendered based on state, no LayersControl) --- */}
         {currentLayer === 'streets' ? (
           <TileLayer
