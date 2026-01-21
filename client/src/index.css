@@ -607,7 +607,7 @@ select:focus {
   }
 
   .stats-widget {
-    bottom: 20px !important;
+    bottom: 40px !important;
     left: 4% !important;
     width: 92% !important;
     right: auto !important;
