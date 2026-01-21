@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaTimes, FaCamera, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
@@ -96,7 +97,7 @@ const AddTripForm = ({ newLocation, onClose, onSaveSuccess }) => {
     } catch (err) { 
       console.error(err); 
       setUploading(false); 
-      alert("Error saving trip!"); 
+      toast.error("Could not save your trip. Please try again.");
     }
   };
 

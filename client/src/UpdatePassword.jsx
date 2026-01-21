@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import axios from "axios";
 import "./index.css";
+import { toast } from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -18,7 +19,7 @@ export default function UpdatePassword({ onClose, currentUser }) {
         oldPassword,
         newPassword
       });
-      alert("Password Updated!");
+      toast.success("Security updated! Your password has been changed.");
       onClose();
     } catch (err) {
       setMsg("Current password incorrect");

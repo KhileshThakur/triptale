@@ -3,6 +3,7 @@ import { FaTimes, FaArrowLeft } from "react-icons/fa";
 import axios from "axios";
 import "./index.css";
 import Loader from './Loader';
+import { toast } from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -60,7 +61,7 @@ export default function Register({ setShowRegister }) {
       };
       
 await axios.post(`${API_URL}/api/users/register`, newUser);      
-      alert("Registration Successful! Please Login.");
+      toast.success("Welcome aboard! Please login to continue.");
       setShowRegister(false); 
 
     } catch (err) {

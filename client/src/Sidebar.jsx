@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaMapMarkerAlt, FaStar, FaTrash, FaPen, FaCamera } from 'react-icons/fa';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 // Constants
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
@@ -109,7 +110,7 @@ const Sidebar = ({ place, onClose, onUpdateMap }) => {
         } catch (err) {
             console.error(err);
             setLoading(false);
-            alert("Update Failed");
+            toast.error("Failed to update trip.");
         }
     };
 
@@ -118,6 +119,7 @@ const Sidebar = ({ place, onClose, onUpdateMap }) => {
             await axios.delete(`${API_URL}/api/places/${place._id}`);
             onUpdateMap();
             onClose();
+            toast.success("Memory removed from your map.");
         }
     }
 

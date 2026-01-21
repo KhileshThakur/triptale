@@ -13,6 +13,7 @@ import Register from './Register';
 import ForgotPassword from './ForgotPassword';
 import UpdatePassword from './UpdatePassword';
 import Loader from './Loader';
+import { Toaster, toast } from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -89,8 +90,8 @@ function MapEventsHandler({ setNewLocation, setSelectedPlace, currentUser }) {
     dblclick: async (e) => {
       // 1. Check Auth First (This fixes the "Logged Out" issue)
       if (!currentUser) {
-        alert("Please login to add a trip!");
-        return; 
+        toast.error("Please login to add a trip!");
+        return;
       }
 
       // 2. Proceed if Logged In
@@ -103,7 +104,7 @@ function MapEventsHandler({ setNewLocation, setSelectedPlace, currentUser }) {
           `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
           { headers: { 'Accept-Language': 'en-US,en;q=0.9' } }
         );
-        
+
         const data = res.data;
         let finalAddress = "";
 
@@ -114,10 +115,10 @@ function MapEventsHandler({ setNewLocation, setSelectedPlace, currentUser }) {
           finalAddress = [city || town || village, country].filter(Boolean).join(", ");
         }
 
-        setNewLocation({ 
-          lat, 
-          lng, 
-          address: finalAddress || "Address not found" 
+        setNewLocation({
+          lat,
+          lng,
+          address: finalAddress || "Address not found"
         });
 
       } catch (err) {
@@ -140,7 +141,7 @@ function App() {
   const [showRegister, setShowRegister] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
   const [showUpdatePass, setShowUpdatePass] = useState(false);
-  
+
   const [places, setPlaces] = useState([]);
   const [newLocation, setNewLocation] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -150,7 +151,7 @@ function App() {
   const [currentLayer, setCurrentLayer] = useState('streets');
 
   const fetchPlaces = async () => {
-    setLoading(true); 
+    setLoading(true);
     try {
       const url = currentUser
         ? `${API_URL}/api/places?username=${currentUser}`
@@ -163,8 +164,8 @@ function App() {
       const [res] = await Promise.all([fetchPromise, timerPromise]);
 
       setPlaces(res.data);
-    } catch (err) { 
-      console.error(err); 
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -185,18 +186,56 @@ function App() {
       if (res.data && res.data.length > 0) {
         const { lat, lon, display_name } = res.data[0];
         setSearchResult({ lat: parseFloat(lat), lng: parseFloat(lon), name: display_name });
-      } else { alert("Location not found"); }
+      } else {
+        toast.error("Location not found! Try a different city.");
+      }
     } catch (err) { console.error(err); }
   };
 
   return (
     <div style={{ height: '100vh', width: '100vw', position: 'relative', overflow: 'hidden' }}>
-      
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            background: '#fff',
+            color: '#333',
+            padding: '16px',
+            borderRadius: '12px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+            fontFamily: "'Segoe UI', sans-serif",
+            fontSize: '0.95rem',
+            maxWidth: '400px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#27ae60',
+              secondary: 'white',
+            },
+            style: {
+              borderLeft: '6px solid #27ae60',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#e74c3c',
+              secondary: 'white',
+            },
+            style: {
+              borderLeft: '6px solid #e74c3c',
+            },
+          },
+        }}
+      />
       {loading && <Loader text="Exploring the world..." />}
 
       <Navbar
         onSearch={handleSearch}
-        onAddClick={() => currentUser ? alert("Double click map!") : setShowLogin(true)}
+        onAddClick={() => currentUser ? toast("✨ Double-click anywhere on the map to pin a memory!", {
+          icon: '👆',
+          style: { borderLeft: '6px solid #3498db' } // Blue border for info
+        }) : setShowLogin(true)}
         onLocateClick={() => setTriggerLocate(true)}
         currentLayer={currentLayer} setLayer={setCurrentLayer}
         currentUser={currentUser}
@@ -222,14 +261,14 @@ function App() {
         style={{ height: "100%", width: "100%", zIndex: 0 }} zoomControl={false}
       >
         <MapController searchResult={searchResult} userLocation={userPos} triggerLocate={triggerLocate} setTriggerLocate={setTriggerLocate} onUserLocationFound={setUserPos} />
-        
+
         {/* --- FIXED: Always Render Handler, Pass currentUser --- */}
-        <MapEventsHandler 
-            setNewLocation={setNewLocation} 
-            setSelectedPlace={setSelectedPlace} 
-            currentUser={currentUser} 
+        <MapEventsHandler
+          setNewLocation={setNewLocation}
+          setSelectedPlace={setSelectedPlace}
+          currentUser={currentUser}
         />
-        
+
         {currentLayer === 'streets' ? (
           <TileLayer url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}" maxZoom={20} subdomains={['mt0', 'mt1', 'mt2', 'mt3']} attribution='&copy; Google Maps' />
         ) : (

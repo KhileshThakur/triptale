@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import axios from "axios";
 import "./index.css";
+import { toast } from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -25,7 +26,7 @@ export default function ForgotPassword({ onClose }) {
     e.preventDefault();
     try {
       await axios.post(`${API_URL}/api/users/reset-password`, { email, otp, newPassword });
-      alert("Password Reset Successful! Please Login.");
+      toast.success("Password reset successfully! You can now login.");
       onClose();
     } catch (err) { setMsg("Invalid OTP"); }
   };
