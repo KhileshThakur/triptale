@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMapEvents, useMap } from 'react-leaflet';
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import L from 'leaflet';
@@ -12,8 +13,8 @@ import Navbar from './Navbar';
 import Login from './Login';
 import Register from './Register';
 import ForgotPassword from './ForgotPassword';
-import UpdatePassword from './UpdatePassword';
 import Loader from './Loader';
+import Profile from './Profile';
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -27,10 +28,57 @@ const searchIcon = new L.Icon({ ...iconConfig, iconUrl: 'https://raw.githubuserc
 const currentLocationIcon = new L.Icon({ ...iconConfig, iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png' });
 
 const StatsWidget = ({ places }) => {
+  // State to control collapse/expand
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const visitedCount = places.filter(p => p.status === 'visited').length;
   const bucketCount = places.filter(p => p.status === 'bucket-list').length;
-  const LegendRow = ({ label, iconUrl }) => ( <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}> <div style={{ width: '24px', display: 'flex', justifyContent: 'center' }}> <img src={iconUrl} alt="pin" style={{ height: '24px' }} /> </div> <span style={{ fontSize: '0.8rem', color: '#555', fontWeight: 600 }}>{label}</span> </div> );
-  return ( <div className="stats-widget"> <div style={{ padding: '16px 20px 10px 20px', background: '#f8f9fa', borderBottom: '1px solid #eee' }}> <h4 style={{ margin: '0 0 12px 0', fontSize: '0.7rem', color: '#999', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800 }}>Map Legend</h4> <LegendRow label="Visited" iconUrl="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png" /> <LegendRow label="Bucket List" iconUrl="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png" /> <LegendRow label="Search Result" iconUrl="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png" /> <LegendRow label="Your Location" iconUrl="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png" /> </div> <div style={{ display: 'flex', background: 'white' }}> <div style={{ flex: 1, padding: '15px 10px', textAlign: 'center', borderRight: '1px solid #eee' }}> <span style={{ display: 'block', fontSize: '1.5rem', fontWeight: 800, color: '#2ecc71', lineHeight: 1, marginBottom: '4px' }}>{visitedCount}</span> <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: '#999', fontWeight: 700 }}>Visited</span> </div> <div style={{ flex: 1, padding: '15px 10px', textAlign: 'center' }}> <span style={{ display: 'block', fontSize: '1.5rem', fontWeight: 800, color: '#f1c40f', lineHeight: 1, marginBottom: '4px' }}>{bucketCount}</span> <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: '#999', fontWeight: 700 }}>Bucket List</span> </div> </div> </div> );
+
+  const LegendRow = ({ label, iconUrl }) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+      <div style={{ width: '24px', display: 'flex', justifyContent: 'center' }}>
+        <img src={iconUrl} alt="pin" style={{ height: '24px' }} />
+      </div>
+      <span style={{ fontSize: '0.8rem', color: '#555', fontWeight: 600 }}>{label}</span>
+    </div>
+  );
+
+  return (
+    <div className={`stats-widget ${isExpanded ? 'expanded' : ''}`}>
+      
+      {/* 1. TOGGLE BUTTON (Visible on Mobile) */}
+      <div 
+        className="widget-toggle" 
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {isExpanded ? <FaChevronDown /> : <FaChevronUp />}
+        <span style={{marginLeft:'5px', fontSize:'0.75rem', fontWeight:700, textTransform:'uppercase'}}>
+            {isExpanded ? 'Hide Legend' : 'Legend'}
+        </span>
+      </div>
+
+      {/* 2. LEGEND SECTION (Collapsible) */}
+      <div className="widget-legend">
+        <h4 style={{ margin: '0 0 12px 0', fontSize: '0.7rem', color: '#999', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800 }}>Map Legend</h4>
+        <LegendRow label="Visited" iconUrl="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png" />
+        <LegendRow label="Bucket List" iconUrl="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png" />
+        <LegendRow label="Search Result" iconUrl="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png" />
+        <LegendRow label="Your Location" iconUrl="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png" />
+      </div>
+
+      {/* 3. COUNTERS SECTION (Always Visible) */}
+      <div className="widget-counters">
+        <div className="stat-item border-right">
+          <span className="stat-num" style={{color: '#2ecc71'}}>{visitedCount}</span>
+          <span className="stat-label">Visited</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-num" style={{color: '#f1c40f'}}>{bucketCount}</span>
+          <span className="stat-label">Bucket List</span>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const MapController = ({ searchResult, userLocation, triggerLocate, setTriggerLocate, onUserLocationFound }) => {
@@ -58,7 +106,7 @@ function MapEventsHandler({ setNewLocation, setSelectedPlace, currentUserId }) {
         const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'en-US,en;q=0.9' } });
         const data = res.data;
         let finalAddress = "";
-        if (data.display_name) { finalAddress = data.display_name; } 
+        if (data.display_name) { finalAddress = data.display_name; }
         else if (data.address) { const { city, town, village, country } = data.address; finalAddress = [city || town || village, country].filter(Boolean).join(", "); }
         setNewLocation({ lat, lng, address: finalAddress || "Address not found" });
       } catch (err) {
@@ -75,17 +123,16 @@ function MapEventsHandler({ setNewLocation, setSelectedPlace, currentUserId }) {
 // ==========================================
 function App() {
   const myStorage = window.localStorage;
-  
+
   // ✅ STATE: Load ID and Name separately
   const [currentUserId, setCurrentUserId] = useState(myStorage.getItem("user_id"));
   const [currentUserName, setCurrentUserName] = useState(myStorage.getItem("user_name"));
-  
+
   const [loading, setLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
-  const [showUpdatePass, setShowUpdatePass] = useState(false);
-
+  const [showProfile, setShowProfile] = useState(false);
   const [places, setPlaces] = useState([]);
   const [newLocation, setNewLocation] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -118,8 +165,9 @@ function App() {
 
   const handleLogout = () => {
     // ✅ CLEAR ALL KEYS
-    myStorage.removeItem("user_id");  
-    myStorage.removeItem("user_name"); 
+    myStorage.removeItem("user_id");
+    myStorage.removeItem("user_name");
+    myStorage.removeItem("user_email");
     myStorage.removeItem("token");
     setCurrentUserId(null);
     setCurrentUserName(null);
@@ -148,14 +196,14 @@ function App() {
         onAddClick={() => currentUserId ? toast("✨ Double-click anywhere on the map to pin a memory!", { icon: '👆', style: { borderLeft: '6px solid #3498db' } }) : setShowLogin(true)}
         onLocateClick={() => setTriggerLocate(true)}
         currentLayer={currentLayer} setLayer={setCurrentLayer}
-        
+
         // ✅ FIX: Use currentUserName for display
-        currentUser={currentUserName} 
-        
+        currentUser={currentUserName}
+
         onLogout={handleLogout}
         onLoginClick={() => setShowLogin(true)}
         onRegisterClick={() => setShowRegister(true)}
-        onUpdatePassClick={() => setShowUpdatePass(true)}
+        onProfileClick={() => setShowProfile(true)}
       />
 
       {currentUserId && <StatsWidget places={places} />}
@@ -165,11 +213,18 @@ function App() {
       {showLogin && <Login setShowLogin={setShowLogin} myStorage={myStorage} setCurrentUser={setCurrentUserName} openForgot={() => setShowForgot(true)} />}
       {showRegister && <Register setShowRegister={setShowRegister} />}
       {showForgot && <ForgotPassword onClose={() => setShowForgot(false)} />}
-      {showUpdatePass && <UpdatePassword onClose={() => setShowUpdatePass(false)} />}
+      {showProfile && (
+        <Profile
+          onClose={() => setShowProfile(false)}
+          currentUser={currentUserName}
+          setCurrentUser={setCurrentUserName}
+          onLogout={handleLogout}
+        />
+      )}
 
       <MapContainer center={[20, 0]} zoom={3} scrollWheelZoom={true} doubleClickZoom={false} style={{ height: "100%", width: "100%", zIndex: 0 }} zoomControl={false}>
         <MapController searchResult={searchResult} userLocation={userPos} triggerLocate={triggerLocate} setTriggerLocate={setTriggerLocate} onUserLocationFound={setUserPos} />
-        
+
         {/* ✅ FIX: Pass currentUserId */}
         <MapEventsHandler
           setNewLocation={setNewLocation}
@@ -177,7 +232,7 @@ function App() {
           currentUserId={currentUserId}
         />
 
-        {currentLayer === 'streets' ? ( <TileLayer url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}" maxZoom={20} subdomains={['mt0', 'mt1', 'mt2', 'mt3']} attribution='&copy; Google Maps' /> ) : ( <TileLayer url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" maxZoom={20} subdomains={['mt0', 'mt1', 'mt2', 'mt3']} attribution='&copy; Google Maps' /> )}
+        {currentLayer === 'streets' ? (<TileLayer url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}" maxZoom={20} subdomains={['mt0', 'mt1', 'mt2', 'mt3']} attribution='&copy; Google Maps' />) : (<TileLayer url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" maxZoom={20} subdomains={['mt0', 'mt1', 'mt2', 'mt3']} attribution='&copy; Google Maps' />)}
 
         {places.map((p) => (
           <Marker key={p._id} position={[p.location.lat, p.location.lng]} icon={p.status === 'visited' ? visitedIcon : bucketIcon} eventHandlers={{ click: () => { setSelectedPlace(p); setNewLocation(null); }, mouseover: (e) => e.target.openTooltip(), mouseout: (e) => e.target.closeTooltip() }}>

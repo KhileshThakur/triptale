@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { FaSearch, FaLocationArrow, FaLayerGroup, FaInfoCircle, FaTimes, FaSignOutAlt, FaUser, FaKey } from 'react-icons/fa';
+import { FaSearch, FaLocationArrow, FaLayerGroup, FaInfoCircle, FaTimes, FaSignOutAlt, FaUser } from 'react-icons/fa';
 
-const Navbar = ({ onSearch, onAddClick, onLocateClick, currentLayer, setLayer, currentUser, onLogout, onLoginClick, onRegisterClick , onUpdatePassClick}) => {
+const Navbar = ({ onSearch, onAddClick, onLocateClick, currentLayer, setLayer, currentUser, onLogout, onLoginClick, onRegisterClick, onProfileClick }) => {
   const [query, setQuery] = useState("");
   const [showLayerMenu, setShowLayerMenu] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -33,11 +33,10 @@ const Navbar = ({ onSearch, onAddClick, onLocateClick, currentLayer, setLayer, c
 
             <div className="icon-btn" onClick={onLocateClick} title="Locate Me"><FaLocationArrow /></div>
             
-            {/* CHECK: currentUser will be the Name string "Khilesh", so this is True */}
             {currentUser ? (
                 <>
                     <div className="btn-add" onClick={onAddClick}><span>+ Add</span></div>
-                    <div className="icon-btn" onClick={onUpdatePassClick} title="Change Password"><FaKey /></div>
+                    <div className="icon-btn" onClick={onProfileClick} title="My Profile"><FaUser /></div>
                     <div className="icon-btn" onClick={onLogout} title="Logout" style={{color:'#ff4757', borderColor:'#ff4757'}}><FaSignOutAlt /></div>
                 </>
             ) : (

@@ -253,7 +253,7 @@ router.post("/login", async (req, res) => {
         if (!validPassword) return res.status(400).json("Wrong email or password!");
 
         const token = jwt.sign({ _id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: "5d" });
-        res.status(200).json({ _id: user._id, username: user.username, token });
+        res.status(200).json({ _id: user._id, username: user.username, email: user.email, token });
     } catch (err) {
         console.error(err);
         res.status(500).json(err.message);
@@ -317,6 +317,60 @@ router.post("/update-password", async (req, res) => {
 
         res.status(200).json("Password updated successfully!");
     } catch (err) { res.status(500).json(err.message); }
+});
+
+// 7. UPDATE USERNAME
+router.put("/update-username", async (req, res) => {
+  try {
+    const { userId, newUsername } = req.body;
+    
+    // Check if username is taken (optional but good practice)
+    // Note: If you allow duplicates, you can skip this check.
+    
+    const updatedUser = await User.findByIdAndUpdate(
+        userId, 
+        { $set: { username: newUsername } },
+        { new: true }
+    );
+    
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+});
+
+// 8. DELETE ACCOUNT (The "Nuclear" Option)
+router.delete("/delete-account/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json("User not found");
+
+    // A. Find all trips by this user
+    const userPlaces = await Place.find({ userId: userId });
+
+    // B. Collect ALL image URLs from ALL trips
+    let allImages = [];
+    userPlaces.forEach(place => {
+        if(place.images) place.images.forEach(img => allImages.push(img.url));
+    });
+
+    // C. Delete all images from Cloudinary
+    console.log(`🗑️ Deleting ${allImages.length} images for user ${user.username}...`);
+    const imagePromises = allImages.map(url => deleteImage(url));
+    await Promise.all(imagePromises);
+
+    // D. Delete all trips from DB
+    await Place.deleteMany({ userId: userId });
+
+    // E. Delete the User
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json("Account and all data deleted successfully.");
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err.message);
+  }
 });
 
 module.exports = router;

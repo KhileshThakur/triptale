@@ -23,6 +23,7 @@ export default function Login({ setShowLogin, myStorage, setCurrentUser, openFor
       // ✅ 1. Save ID (for Logic) and Name (for Display)
       myStorage.setItem("user_id", res.data._id);       
       myStorage.setItem("user_name", res.data.username);
+      myStorage.setItem("user_email", res.data.email);
       myStorage.setItem("token", res.data.token);
       
       // 2. Update Parent State

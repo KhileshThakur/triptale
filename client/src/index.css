@@ -4,23 +4,28 @@
    1. VIBRANT THEME VARIABLES
    ========================================= */
 :root {
-  --primary: #FF4757;       /* Vibrant Red */
+  --primary: #FF4757;
+  /* Vibrant Red */
   --primary-gradient: linear-gradient(135deg, #FF4757 0%, #FF6B81 100%);
-  
-  --visited-bg: #D1F2EB;    /* Mint */
-  --visited-text: #0E9174;  /* Teal */
-  
-  --bucket-bg: #FCF3CF;     /* Cream */
-  --bucket-text: #F39C12;   /* Orange */
-  
-  --accent-blue: #3742fa;   
-  
+
+  --visited-bg: #D1F2EB;
+  /* Mint */
+  --visited-text: #0E9174;
+  /* Teal */
+
+  --bucket-bg: #FCF3CF;
+  /* Cream */
+  --bucket-text: #F39C12;
+  /* Orange */
+
+  --accent-blue: #3742fa;
+
   --glass-bg: rgba(255, 255, 255, 0.95);
   --bg-surface: #ffffff;
-  
+
   --text-main: #2f3542;
   --text-light: #747d8c;
-  
+
   --shadow-strong: 0 10px 25px rgba(0, 0, 0, 0.15);
   --radius-lg: 24px;
   --radius-sm: 12px;
@@ -49,18 +54,35 @@ body {
 .custom-tooltip {
   background: white !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
   padding: 6px 12px !important;
   border-radius: 8px !important;
   font-family: 'Quicksand', sans-serif !important;
   font-weight: 700 !important;
-  margin-top: -5px !important; 
+  margin-top: -5px !important;
 }
-.leaflet-tooltip-top:before { border-top-color: white; }
 
-.tooltip-content { text-align: center; line-height: 1.2; }
-.tooltip-title { color: var(--text-main); font-size: 0.85rem; }
-.tooltip-date { font-size: 0.7rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.leaflet-tooltip-top:before {
+  border-top-color: white;
+}
+
+.tooltip-content {
+  text-align: center;
+  line-height: 1.2;
+}
+
+.tooltip-title {
+  color: var(--text-main);
+  font-size: 0.85rem;
+}
+
+.tooltip-date {
+  font-size: 0.7rem;
+  color: var(--text-light);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
 
 
 /* =========================================
@@ -83,7 +105,7 @@ body {
   align-items: center;
   z-index: 1000;
   gap: 15px;
-  border: 1px solid rgba(255,255,255,0.8); 
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 .logo {
@@ -103,7 +125,7 @@ body {
   border-radius: 50px;
   padding: 0 20px;
   height: 50px;
-  border: 2px solid transparent; 
+  border: 2px solid transparent;
   transition: all 0.3s ease;
 }
 
@@ -125,7 +147,11 @@ body {
   padding-left: 10px;
 }
 
-.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
 /* =========================================
    4. BUTTONS & WIDGETS
@@ -140,16 +166,21 @@ body {
   justify-content: center;
   cursor: pointer;
   color: #57606f;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: 0.2s;
   font-size: 1.2rem;
 }
+
 .icon-btn:hover {
   color: var(--accent-blue);
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
-.icon-btn.active { color: var(--accent-blue); background: #eff3ff; }
+
+.icon-btn.active {
+  color: var(--accent-blue);
+  background: #eff3ff;
+}
 
 .btn-add {
   background: var(--primary-gradient);
@@ -166,23 +197,68 @@ body {
   transition: transform 0.2s;
   white-space: nowrap;
 }
-.btn-add:hover { transform: translateY(-2px) scale(1.02); }
+
+.btn-add:hover {
+  transform: translateY(-2px) scale(1.02);
+}
 
 /* --- STATS WIDGET (Vertical Card) --- */
 .stats-widget {
   position: absolute;
   bottom: 30px;
   right: 30px;
-  background: var(--glass-bg);
-  /* Padding handled by inner divs */
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: 20px;
-  box-shadow: var(--shadow-strong);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   z-index: 999;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
+  overflow: hidden;
   border: 1px solid white;
   min-width: 200px;
-  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Hide Toggle on Desktop (Always Expanded) */
+.widget-toggle {
+  display: none;
+}
+
+.widget-legend {
+  padding: 16px 20px 10px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.widget-counters {
+  display: flex;
+  background: white;
+}
+
+.stat-item {
+  flex: 1;
+  padding: 15px 10px;
+  text-align: center;
+}
+
+.stat-item.border-right {
+  border-right: 1px solid #eee;
+}
+
+.stat-num {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: #999;
+  font-weight: 700;
 }
 
 /* =========================================
@@ -202,16 +278,32 @@ body {
   border: 1px solid #eee;
   scrollbar-width: none;
 }
-.tripdetail-panel::-webkit-scrollbar { display: none; }
 
-.view-tripdetail { right: 20px; transform: translateX(120%); }
-.view-tripdetail.open { transform: translateX(0); }
+.tripdetail-panel::-webkit-scrollbar {
+  display: none;
+}
 
-.add-tripdetail { left: 20px; transform: translateX(-120%); }
-.add-tripdetail.open { transform: translateX(0); }
+.view-tripdetail {
+  right: 20px;
+  transform: translateX(120%);
+}
+
+.view-tripdetail.open {
+  transform: translateX(0);
+}
+
+.add-tripdetail {
+  left: 20px;
+  transform: translateX(-120%);
+}
+
+.add-tripdetail.open {
+  transform: translateX(0);
+}
 
 .close-btn {
-  position: absolute; /* Fixed positioning relative to the panel */
+  position: absolute;
+  /* Fixed positioning relative to the panel */
   top: 20px;
   right: 20px;
   width: 40px;
@@ -225,19 +317,34 @@ body {
   justify-content: center;
   color: #333;
   transition: 0.2s;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  z-index: 2001; /* Ensure it stays on top of content */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 2001;
+  /* Ensure it stays on top of content */
 }
+
 .close-btn:hover {
   background: #dfe4ea;
   transform: rotate(90deg);
 }
+
 /* =========================================
    6. FORMS & EDIT MODE
    ========================================= */
-.form-container { padding: 40px 30px; }
-.form-header { font-size: 1.6rem; font-weight: 800; margin-bottom: 25px; color: var(--text-main); }
-.form-group { margin-bottom: 20px; }
+.form-container {
+  padding: 40px 30px;
+}
+
+.form-header {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  color: var(--text-main);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
 label {
   display: block;
   font-size: 0.8rem;
@@ -247,7 +354,9 @@ label {
   margin-bottom: 8px;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   width: 100%;
   padding: 14px;
   background: #f8f9fa;
@@ -259,7 +368,10 @@ input, textarea, select {
   transition: 0.2s;
   box-sizing: border-box;
 }
-input:focus, textarea:focus, select:focus {
+
+input:focus,
+textarea:focus,
+select:focus {
   background: #fff;
   border-color: var(--primary);
   outline: none;
@@ -278,7 +390,11 @@ input:focus, textarea:focus, select:focus {
   margin-top: 15px;
   transition: 0.2s;
 }
-.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4); }
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+}
 
 /* --- EDIT MODE IMAGE GRID --- */
 .edit-image-grid {
@@ -287,11 +403,13 @@ input:focus, textarea:focus, select:focus {
   flex-wrap: wrap;
   margin-bottom: 15px;
 }
+
 .edit-image-item {
   position: relative;
   width: 70px;
   height: 70px;
 }
+
 .edit-image-item img {
   width: 100%;
   height: 100%;
@@ -299,6 +417,7 @@ input:focus, textarea:focus, select:focus {
   object-fit: cover;
   border: 1px solid #ddd;
 }
+
 .btn-delete-img {
   position: absolute;
   top: -6px;
@@ -314,7 +433,7 @@ input:focus, textarea:focus, select:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* =========================================
@@ -326,7 +445,10 @@ input:focus, textarea:focus, select:focus {
   object-fit: cover;
   border-bottom: 1px solid #eee;
 }
-.content-pad { padding: 30px; }
+
+.content-pad {
+  padding: 30px;
+}
 
 .badge {
   display: inline-block;
@@ -337,15 +459,48 @@ input:focus, textarea:focus, select:focus {
   text-transform: uppercase;
   margin-bottom: 15px;
 }
-.badge.visited { background: var(--visited-bg); color: var(--visited-text); }
-.badge.bucket-list { background: var(--bucket-bg); color: var(--bucket-text); }
 
-.title-lg { font-size: 2rem; font-weight: 800; margin: 0 0 10px 0; }
-.desc-text { line-height: 1.8; color: #57606f; font-size: 1.05rem; white-space: pre-wrap; margin-bottom: 30px; }
+.badge.visited {
+  background: var(--visited-bg);
+  color: var(--visited-text);
+}
 
-.memory-card { margin-bottom: 25px; }
-.memory-card img { width: 100%; border-radius: 16px; box-shadow: var(--shadow-strong); }
-.memory-caption { margin-top: 10px; font-style: italic; color: #a4b0be; padding-left: 10px; border-left: 3px solid #eee; }
+.badge.bucket-list {
+  background: var(--bucket-bg);
+  color: var(--bucket-text);
+}
+
+.title-lg {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+}
+
+.desc-text {
+  line-height: 1.8;
+  color: #57606f;
+  font-size: 1.05rem;
+  white-space: pre-wrap;
+  margin-bottom: 30px;
+}
+
+.memory-card {
+  margin-bottom: 25px;
+}
+
+.memory-card img {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: var(--shadow-strong);
+}
+
+.memory-caption {
+  margin-top: 10px;
+  font-style: italic;
+  color: #a4b0be;
+  padding-left: 10px;
+  border-left: 3px solid #eee;
+}
 
 .photo-uploader {
   border: 2px dashed #ccc;
@@ -355,46 +510,179 @@ input:focus, textarea:focus, select:focus {
   text-align: center;
   cursor: pointer;
 }
+
 .preview-card {
-  display: flex; gap: 10px; background: white; padding: 10px;
-  border: 1px solid #eee; border-radius: 12px; margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  background: white;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  margin-top: 10px;
 }
-.preview-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+
+.preview-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+}
 
 /* =========================================
    8. MOBILE RESPONSIVE
    ========================================= */
 @media (max-width: 600px) {
   .floating-nav {
-    top: 10px; width: 92%; border-radius: 25px; flex-wrap: wrap; gap: 10px; padding: 15px;
+    top: 10px;
+    width: 92%;
+    border-radius: 25px;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 15px;
+    justify-content: center;
   }
-  .logo { order: 1; font-size: 1.3rem; }
-  .nav-right { order: 2; margin-left: auto; }
-  .search-bar { order: 3; width: 100%; margin-top: 5px; }
-  
-  .btn-add { width: 48px; padding: 0; }
-  .btn-add span { display: none; }
-  .btn-add::after { content: "+"; font-size: 1.5rem; }
+
+  .logo {
+    order: 1;
+    font-size: 1.3rem;
+  }
+
+  .icon-btn {
+    width: 35px;
+    height: 35px;
+  }
+
+  .nav-right {
+    order: 2;
+  }
+
+  .search-bar {
+    order: 3;
+    width: 100%;
+    margin-top: 5px;
+    height: 30px;
+  }
+
+  .btn-add {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+  }
+
+  .btn-add span {
+    display: none;
+  }
+
+  .btn-add::after {
+    content: "+";
+    font-size: 1rem;
+  }
 
   .tripdetail-panel {
-    top: auto; bottom: 0; left: 0; right: 0; width: 100%; height: 85vh;
-    border-radius: 25px 25px 0 0; border: none; box-shadow: 0 -5px 30px rgba(0,0,0,0.2);
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 85vh;
+    border-radius: 25px 25px 0 0;
+    border: none;
+    box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.2);
   }
-  .view-tripdetail { transform: translateY(100%); }
-  .view-tripdetail.open { transform: translateY(0); }
-  .add-tripdetail { transform: translateY(100%); }
-  .add-tripdetail.open { transform: translateY(0); }
 
-  /* FIX: STATS WIDGET BOTTOM RIGHT & SMALLER */
-  .stats-widget {
-    bottom: 90px; /* Moved up slightly to not block attribution */
-    right: 15px;  /* Stick to right */
-    left: auto;
-    transform: none; /* Remove center transform */
-    width: auto;
-    min-width: 140px; /* Smaller width */
-    zoom: 0.85; /* Scale down slightly */
+  .view-tripdetail {
+    transform: translateY(100%);
   }
-  .stats-widget .stat-num { font-size: 1.2rem; } /* Smaller numbers */
-  .stats-widget h4 { font-size: 0.6rem; } /* Smaller title */
+
+  .view-tripdetail.open {
+    transform: translateY(0);
+  }
+
+  .add-tripdetail {
+    transform: translateY(100%);
+  }
+
+  .add-tripdetail.open {
+    transform: translateY(0);
+  }
+
+  .stats-widget {
+    bottom: 20px !important;
+    left: 4% !important;
+    width: 92% !important;
+    right: auto !important;
+
+    /* Reset Desktop Styles */
+    flex-direction: column !important;
+    /* Stack items vertically */
+    padding: 0 !important;
+    height: auto !important;
+    /* Allow growing */
+    min-width: unset !important;
+    border-radius: 16px !important;
+    background: white !important;
+  }
+
+  /* 1. TOGGLE BUTTON (Visible Only on Mobile) */
+  .widget-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 8px 0;
+    background: #f1f2f6;
+    color: #777;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+  }
+
+  .widget-toggle:active {
+    background: #e1e2e6;
+  }
+
+  /* 2. LEGEND SECTION (Hidden by default, shown when expanded) */
+  .widget-legend {
+    display: none !important;
+    /* Collapsed by default */
+    padding: 15px !important;
+    background: #fff !important;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  /* When the parent has class .expanded, show the legend */
+  .stats-widget.expanded .widget-legend {
+    display: block !important;
+    border-bottom: 1px solid #eee !important;
+  }
+
+  /* 3. COUNTERS (Always Visible Row) */
+  .widget-counters {
+    display: flex !important;
+    width: 100% !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    padding: 0 !important;
+  }
+
+  .stat-item {
+    padding: 10px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* Animation for smooth opening */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
 }
