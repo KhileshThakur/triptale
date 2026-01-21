@@ -8,7 +8,7 @@ const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 const API_URL = import.meta.env.VITE_API_URL || ""; // Get from Env
 
-const Sidebar = ({ place, onClose, onUpdateMap }) => {
+const TripDetails = ({ place, onClose, onUpdateMap }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -27,7 +27,7 @@ const Sidebar = ({ place, onClose, onUpdateMap }) => {
             resetEditState(place);
         }
         // Note: We DO NOT clear displayPlace when place is null 
-        // This ensures the content stays there while the sidebar slides away
+        // This ensures the content stays there while the TripDetails slides away
     }, [place]);
 
     const resetEditState = (data) => {
@@ -133,7 +133,7 @@ const Sidebar = ({ place, onClose, onUpdateMap }) => {
     const isBucketList = displayPlace.status === 'bucket-list';
 
     return (
-        <div className={`sidebar-panel view-sidebar ${place ? 'open' : ''}`}>
+        <div className={`tripdetail-panel view-tripdetail ${place ? 'open' : ''}`}>
 
             {/* CLOSE BUTTON - Fixed position so it doesn't scroll away */}
             <button
@@ -265,4 +265,4 @@ const Sidebar = ({ place, onClose, onUpdateMap }) => {
     );
 };
 
-export default Sidebar;
+export default TripDetails;

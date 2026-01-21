@@ -107,7 +107,7 @@ const AddTripForm = ({ newLocation, onClose, onSaveSuccess }) => {
     : (newLocation ? `${newLocation.lat.toFixed(4)}, ${newLocation.lng.toFixed(4)}` : "Select a location");
 
   return (
-    <div className={`sidebar-panel add-sidebar ${newLocation ? 'open' : ''}`}>
+    <div className={`tripdetail-panel add-tripdetail ${newLocation ? 'open' : ''}`}>
         {uploading && (
         <div style={{
             position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', 

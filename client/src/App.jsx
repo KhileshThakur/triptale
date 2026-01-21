@@ -5,7 +5,7 @@ import axios from 'axios';
 import L from 'leaflet';
 
 // Import Sub-Components
-import Sidebar from './Sidebar';
+import TripDetails from './TripDetails';
 import AddTripForm from './AddTripForm';
 import Navbar from './Navbar';
 import Login from './Login';
@@ -247,7 +247,7 @@ function App() {
 
       {/* Show these only if logged in */}
       {currentUser && <StatsWidget places={places} />}
-      {currentUser && <Sidebar place={selectedPlace} onClose={() => setSelectedPlace(null)} onUpdateMap={fetchPlaces} />}
+      {currentUser && <TripDetails place={selectedPlace} onClose={() => setSelectedPlace(null)} onUpdateMap={fetchPlaces} />}
       {currentUser && <AddTripForm newLocation={newLocation} onClose={() => setNewLocation(null)} onSaveSuccess={() => { setNewLocation(null); fetchPlaces(); }} />}
 
       {/* Auth Modals */}
@@ -280,7 +280,7 @@ function App() {
             key={p._id} position={[p.location.lat, p.location.lng]} icon={p.status === 'visited' ? visitedIcon : bucketIcon}
             eventHandlers={{ click: () => { setSelectedPlace(p); setNewLocation(null); }, mouseover: (e) => e.target.openTooltip(), mouseout: (e) => e.target.closeTooltip() }}
           >
-            <Tooltip direction="top" offset={[0, -32]} opacity={1} className="custom-tooltip">
+            <Tooltip direction="top" offset={[0, -5]} opacity={1} className="custom-tooltip">
               <div className="tooltip-content"><div className="tooltip-title">{p.title}</div><div className="tooltip-date">{p.status === 'visited' && p.visitDate ? new Date(p.visitDate).getFullYear() : 'Dream'}</div></div>
             </Tooltip>
           </Marker>

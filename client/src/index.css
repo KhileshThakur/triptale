@@ -186,9 +186,9 @@ body {
 }
 
 /* =========================================
-   5. SIDEBARS
+   5. tripdetailS
    ========================================= */
-.sidebar-panel {
+.tripdetail-panel {
   position: fixed;
   top: 20px;
   bottom: 20px;
@@ -202,13 +202,13 @@ body {
   border: 1px solid #eee;
   scrollbar-width: none;
 }
-.sidebar-panel::-webkit-scrollbar { display: none; }
+.tripdetail-panel::-webkit-scrollbar { display: none; }
 
-.view-sidebar { right: 20px; transform: translateX(120%); }
-.view-sidebar.open { transform: translateX(0); }
+.view-tripdetail { right: 20px; transform: translateX(120%); }
+.view-tripdetail.open { transform: translateX(0); }
 
-.add-sidebar { left: 20px; transform: translateX(-120%); }
-.add-sidebar.open { transform: translateX(0); }
+.add-tripdetail { left: 20px; transform: translateX(-120%); }
+.add-tripdetail.open { transform: translateX(0); }
 
 .close-btn {
   position: absolute; /* Fixed positioning relative to the panel */
@@ -376,14 +376,14 @@ input:focus, textarea:focus, select:focus {
   .btn-add span { display: none; }
   .btn-add::after { content: "+"; font-size: 1.5rem; }
 
-  .sidebar-panel {
+  .tripdetail-panel {
     top: auto; bottom: 0; left: 0; right: 0; width: 100%; height: 85vh;
     border-radius: 25px 25px 0 0; border: none; box-shadow: 0 -5px 30px rgba(0,0,0,0.2);
   }
-  .view-sidebar { transform: translateY(100%); }
-  .view-sidebar.open { transform: translateY(0); }
-  .add-sidebar { transform: translateY(100%); }
-  .add-sidebar.open { transform: translateY(0); }
+  .view-tripdetail { transform: translateY(100%); }
+  .view-tripdetail.open { transform: translateY(0); }
+  .add-tripdetail { transform: translateY(100%); }
+  .add-tripdetail.open { transform: translateY(0); }
 
   /* FIX: STATS WIDGET BOTTOM RIGHT & SMALLER */
   .stats-widget {
