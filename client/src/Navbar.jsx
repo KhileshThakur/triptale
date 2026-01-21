@@ -13,19 +13,14 @@ const Navbar = ({ onSearch, onAddClick, onLocateClick, currentLayer, setLayer, c
       <nav className="floating-nav">
         <div className="logo">TripTale.</div>
         
-        {/* Search: Visible to everyone, or restrict if you prefer */}
         <form onSubmit={handleSearch} className="search-bar">
           <FaSearch color="#B2BEC3" />
           <input type="text" placeholder="Search places..." value={query} onChange={(e) => setQuery(e.target.value)} />
         </form>
         
         <div className="nav-right">
-            {/* --- 1. GLOBAL MAP TOOLS (Visible to Everyone) --- */}
-            
-            {/* Info Button */}
             <div className="icon-btn" onClick={() => setShowInfo(true)} title="Guide"><FaInfoCircle /></div>
 
-            {/* Layer Switcher */}
             <div style={{position: 'relative'}}>
                 <div className={`icon-btn ${showLayerMenu ? 'active' : ''}`} onClick={() => setShowLayerMenu(!showLayerMenu)} title="Change Map Layer"><FaLayerGroup /></div>
                 {showLayerMenu && (
@@ -36,9 +31,9 @@ const Navbar = ({ onSearch, onAddClick, onLocateClick, currentLayer, setLayer, c
                 )}
             </div>
 
-            {/* Locate Me */}
             <div className="icon-btn" onClick={onLocateClick} title="Locate Me"><FaLocationArrow /></div>
-            {/* --- 2. AUTH BUTTONS (Login Logic) --- */}
+            
+            {/* CHECK: currentUser will be the Name string "Khilesh", so this is True */}
             {currentUser ? (
                 <>
                     <div className="btn-add" onClick={onAddClick}><span>+ Add</span></div>
@@ -54,7 +49,6 @@ const Navbar = ({ onSearch, onAddClick, onLocateClick, currentLayer, setLayer, c
         </div>
       </nav>
 
-      {/* INSTRUCTIONS MODAL */}
       {showInfo && (
           <div style={{position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(5px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
               <div style={{background: 'white', padding: '30px', borderRadius: '24px', width: '90%', maxWidth: '420px', boxShadow: '0 20px 50px rgba(0,0,0,0.2)', position: 'relative'}}>

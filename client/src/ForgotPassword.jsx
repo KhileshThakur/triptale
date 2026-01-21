@@ -32,14 +32,9 @@ export default function ForgotPassword({ onClose }) {
   };
 
   return (
-    <div className="loginContainer" style={{
-        position: 'absolute', top: 0, left: 0, width: '100%', height: '100vh',
-        background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(8px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000
-    }}>
+    <div className="loginContainer" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100vh', background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
       <div style={{width: '320px', padding: '30px', background: 'white', borderRadius: '24px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)', position: 'relative'}}>
         <h3 style={{textAlign:'center', marginTop:0}}>Reset Password</h3>
-        
         {step === 1 ? (
             <form onSubmit={handleSendOtp} style={{display:'flex', flexDirection:'column', gap:'15px'}}>
                 <input type="email" placeholder="Enter your email" value={email} onChange={e=>setEmail(e.target.value)} required />
@@ -52,7 +47,6 @@ export default function ForgotPassword({ onClose }) {
                 <button className="btn-add" style={{width:'100%', justifyContent:'center'}}>Update Password</button>
             </form>
         )}
-        
         {msg && <div style={{textAlign:'center', marginTop:'10px', color:'#FF4757', fontSize:'0.9rem'}}>{msg}</div>}
         <FaTimes style={{position:'absolute', top:'20px', right:'20px', cursor:'pointer'}} onClick={onClose} />
       </div>

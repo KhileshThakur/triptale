@@ -301,16 +301,18 @@ router.post("/reset-password", async (req, res) => {
 // 6. UPDATE PASSWORD
 router.post("/update-password", async (req, res) => {
     try {
-        const { username, oldPassword, newPassword } = req.body;
-        const user = await User.findOne({ username });
+        // 👇 Expect userId
+        const { userId, oldPassword, newPassword } = req.body;
+        
+        // Find by ID
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json("User not found!");
 
         const validPassword = await bcrypt.compare(oldPassword, user.password);
         if (!validPassword) return res.status(400).json("Current password incorrect!");
 
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-        user.password = hashedPassword;
+        user.password = await bcrypt.hash(newPassword, salt);
         await user.save();
 
         res.status(200).json("Password updated successfully!");

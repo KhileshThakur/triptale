@@ -6,23 +6,30 @@ import { toast } from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
-export default function UpdatePassword({ onClose, currentUser }) {
+// Removed 'currentUser' prop, fetching ID from storage
+export default function UpdatePassword({ onClose }) {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
+    const userId = localStorage.getItem("user_id"); // ✅ GET ID
+
     try {
       await axios.post(`${API_URL}/api/users/update-password`, {
-        username: currentUser,
+        userId: userId, // ✅ SEND ID
         oldPassword,
         newPassword
       });
       toast.success("Security updated! Your password has been changed.");
+      setLoading(false);
       onClose();
     } catch (err) {
-      setMsg("Current password incorrect");
+      setLoading(false);
+      toast.error(err.response?.data || "Current password incorrect");
     }
   };
 
@@ -38,10 +45,11 @@ export default function UpdatePassword({ onClose, currentUser }) {
         <form onSubmit={handleUpdate} style={{display:'flex', flexDirection:'column', gap:'15px'}}>
             <input type="password" placeholder="Current Password" value={oldPassword} onChange={e=>setOldPassword(e.target.value)} required />
             <input type="password" placeholder="New Password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} required />
-            <button className="btn-add" style={{width:'100%', justifyContent:'center'}}>Save Changes</button>
+            <button className="btn-add" style={{width:'100%', justifyContent:'center'}} disabled={loading}>
+                {loading ? "Updating..." : "Save Changes"}
+            </button>
         </form>
         
-        {msg && <div style={{textAlign:'center', marginTop:'10px', color:'#FF4757', fontSize:'0.9rem'}}>{msg}</div>}
         <FaTimes style={{position:'absolute', top:'20px', right:'20px', cursor:'pointer'}} onClick={onClose} />
       </div>
     </div>
