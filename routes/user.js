@@ -297,7 +297,7 @@ router.post("/login", async (req, res) => {
         if (!validPassword) return res.status(400).json("Wrong email or password!");
 
         const token = jwt.sign({ _id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: "5d" });
-        res.status(200).json({ _id: user._id, username: user.username, email: user.email, token });
+        res.status(200).json({ _id: user._id, username: user.username, name: user.name || "", email: user.email, token });
     } catch (err) {
         console.error(err);
         res.status(500).json(err.message);
@@ -377,6 +377,31 @@ router.put("/update-username", async (req, res) => {
         { new: true }
     );
     
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+});
+
+// 8. UPDATE NAME
+router.put("/update-name", async (req, res) => {
+  try {
+    const { userId, newName } = req.body;
+
+    if (!newName || !newName.trim()) {
+      return res.status(400).json("Name cannot be empty");
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: { name: newName.trim() } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json("User not found");
+    }
+
     res.status(200).json(updatedUser);
   } catch (err) {
     res.status(500).json(err.message);
