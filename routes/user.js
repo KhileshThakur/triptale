@@ -222,25 +222,69 @@ router.post("/send-otp", async (req, res) => {
     }
 });
 
+router.get("/check-username/:username", async (req, res) => {
+  try {
+    const username = req.params.username.toLowerCase();
+
+    const user = await User.findOne({ username });
+
+    res.json({
+      available: !user
+    });
+  } catch (err) {
+    res.status(500).json({
+      available: false,
+      message: "Unable to check username"
+    });
+  }
+});
+
 // 2. REGISTER (Verify & Create)
 router.post("/register", async (req, res) => {
-    try {
-        const { username, email, password, otp } = req.body;
+  try {
+    const { username, name, email, password, otp } = req.body;
 
-        const validOtp = await Otp.findOne({ email, code: otp });
-        if (!validOtp) return res.status(400).json("Invalid or expired OTP!");
+    const validOtp = await Otp.findOne({ email, code: otp });
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-        const newUser = new User({ username, email, password: hashedPassword });
-        const user = await newUser.save();
-
-        await Otp.deleteMany({ email });
-        res.status(200).json(user._id);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json("Registration failed");
+    if (!validOtp) {
+      return res.status(400).json("Invalid or expired OTP!");
     }
+
+    const existingUser = await User.findOne({
+      $or: [
+        { username: username.toLowerCase() },
+        { email: email.toLowerCase() }
+      ]
+    });
+
+    if (existingUser) {
+      if (existingUser.username === username.toLowerCase()) {
+        return res.status(409).json("Username already taken!");
+      }
+
+      return res.status(409).json("Email already registered!");
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = new User({
+      username: username.toLowerCase(),
+      name: name?.trim() || "",
+      email: email.toLowerCase(),
+      password: hashedPassword
+    });
+
+    const user = await newUser.save();
+
+    await Otp.deleteMany({ email });
+
+    res.status(200).json(user._id);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json("Registration failed");
+  }
 });
 
 // 3. LOGIN

@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMapEvents, useMap } from 'react-leaflet';
-import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import {
+  FaChevronUp,
+  FaChevronDown,
+  FaTimes,
+  FaMapMarkerAlt
+} from 'react-icons/fa';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import L from 'leaflet';
@@ -27,7 +32,7 @@ const bucketIcon = new L.Icon({ ...iconConfig, iconUrl: 'https://raw.githubuserc
 const searchIcon = new L.Icon({ ...iconConfig, iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png' });
 const currentLocationIcon = new L.Icon({ ...iconConfig, iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png' });
 
-const StatsWidget = ({ places }) => {
+const StatsWidget = ({ places, onOpenList }) => {
   // State to control collapse/expand
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -45,15 +50,15 @@ const StatsWidget = ({ places }) => {
 
   return (
     <div className={`stats-widget ${isExpanded ? 'expanded' : ''}`}>
-      
+
       {/* 1. TOGGLE BUTTON (Visible on Mobile) */}
-      <div 
-        className="widget-toggle" 
+      <div
+        className="widget-toggle"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         {isExpanded ? <FaChevronDown /> : <FaChevronUp />}
-        <span style={{marginLeft:'5px', fontSize:'0.75rem', fontWeight:700, textTransform:'uppercase'}}>
-            {isExpanded ? 'Hide Legend' : 'Legend'}
+        <span style={{ marginLeft: '5px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
+          {isExpanded ? 'Hide Legend' : 'Legend'}
         </span>
       </div>
 
@@ -68,22 +73,137 @@ const StatsWidget = ({ places }) => {
 
       {/* 3. COUNTERS SECTION (Always Visible) */}
       <div className="widget-counters">
-        <div className="stat-item border-right">
-          <span className="stat-num" style={{color: '#2ecc71'}}>{visitedCount}</span>
-          <span className="stat-label">Visited</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-num" style={{color: '#f1c40f'}}>{bucketCount}</span>
-          <span className="stat-label">Bucket List</span>
-        </div>
+        <button
+          className="stat-item border-right"
+          onClick={() => onOpenList("visited")}
+        >
+          <span className="stat-num" style={{ color: '#2ecc71' }}>
+            {visitedCount}
+          </span>
+
+          <span className="stat-label">
+            Visited
+          </span>
+        </button>
+
+        <button
+          className="stat-item"
+          onClick={() => onOpenList("bucket-list")}
+        >
+          <span className="stat-num" style={{ color: '#f1c40f' }}>
+            {bucketCount}
+          </span>
+
+          <span className="stat-label">
+            Bucket List
+          </span>
+        </button>
       </div>
     </div>
   );
 };
 
-const MapController = ({ searchResult, userLocation, triggerLocate, setTriggerLocate, onUserLocationFound }) => {
+const PlaceList = ({ places, status, onSelectPlace, onClose }) => {
+  const filteredPlaces = places.filter((p) => p.status === status);
+
+  const title = status === "visited"
+    ? "Visited Places"
+    : "Bucket List";
+
+  return (
+    <div className="place-list-panel">
+
+      <div className="place-list-header">
+        <div>
+          <h3>{title}</h3>
+          <span>{filteredPlaces.length} places</span>
+        </div>
+
+        <button
+          className="place-list-close"
+          onClick={onClose}
+        >
+          <FaTimes />
+        </button>
+      </div>
+
+      <div className="place-list-content">
+
+        {filteredPlaces.length === 0 ? (
+          <div className="place-list-empty">
+            <FaMapMarkerAlt size={24} />
+            <p>
+              {status === "visited"
+                ? "You haven't added any visited places yet."
+                : "Your bucket list is empty."}
+            </p>
+          </div>
+        ) : (
+          filteredPlaces.map((place) => (
+            <button
+              key={place._id}
+              className="place-list-item"
+              onClick={() => onSelectPlace(place)}
+            >
+              <div className="place-list-icon">
+                <FaMapMarkerAlt />
+              </div>
+
+              <div className="place-list-info">
+                <div className="place-list-title">
+                  {place.title}
+                </div>
+
+                <div className="place-list-address">
+                  {place.location?.address || "Location"}
+                </div>
+
+                {status === "visited" && place.visitDate && (
+                  <div className="place-list-date">
+                    {new Date(place.visitDate).toLocaleDateString(
+                      undefined,
+                      {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric"
+                      }
+                    )}
+                  </div>
+                )}
+              </div>
+            </button>
+          ))
+        )}
+
+      </div>
+    </div>
+  );
+};
+
+const MapController = ({
+  searchResult,
+  userLocation,
+  triggerLocate,
+  setTriggerLocate,
+  onUserLocationFound,
+  selectedPlace
+}) => {
   const map = useMap();
   useEffect(() => { if (searchResult) map.flyTo([searchResult.lat, searchResult.lng], 14, { animate: true, duration: 1.5 }); }, [searchResult, map]);
+  useEffect(() => {
+    if (selectedPlace?.location) {
+      const { lat, lng } = selectedPlace.location;
+
+      map.flyTo(
+        [lat, lng],
+        14,
+        {
+          animate: true,
+          duration: 1.5
+        }
+      );
+    }
+  }, [selectedPlace, map]);
   useEffect(() => { if (userLocation) map.flyTo([userLocation.lat, userLocation.lng], 13, { animate: true, duration: 1.5 }); }, [userLocation, map]);
   useEffect(() => { if (triggerLocate) { map.locate(); setTriggerLocate(false); } }, [triggerLocate, map, setTriggerLocate]);
   useMapEvents({ locationfound(e) { onUserLocationFound(e.latlng); map.flyTo(e.latlng, 13, { animate: true }); }, });
@@ -136,6 +256,7 @@ function App() {
   const [places, setPlaces] = useState([]);
   const [newLocation, setNewLocation] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [placeListStatus, setPlaceListStatus] = useState(null);
   const [userPos, setUserPos] = useState(null);
   const [searchResult, setSearchResult] = useState(null);
   const [triggerLocate, setTriggerLocate] = useState(false);
@@ -186,6 +307,12 @@ function App() {
     } catch (err) { console.error(err); }
   };
 
+  const handleSelectPlace = (place) => {
+    setSelectedPlace(place);
+    setNewLocation(null);
+    setPlaceListStatus(null);
+  };
+
   return (
     <div style={{ height: '100vh', width: '100vw', position: 'relative', overflow: 'hidden' }}>
       <Toaster position="top-center" reverseOrder={false} toastOptions={{ style: { background: '#fff', color: '#333', padding: '16px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)', fontFamily: "'Segoe UI', sans-serif", fontSize: '0.95rem', maxWidth: '400px' }, success: { iconTheme: { primary: '#27ae60', secondary: 'white' }, style: { borderLeft: '6px solid #27ae60' } }, error: { iconTheme: { primary: '#e74c3c', secondary: 'white' }, style: { borderLeft: '6px solid #e74c3c' } } }} />
@@ -206,7 +333,20 @@ function App() {
         onProfileClick={() => setShowProfile(true)}
       />
 
-      {currentUserId && <StatsWidget places={places} />}
+      {currentUserId && (
+        <StatsWidget
+          places={places}
+          onOpenList={setPlaceListStatus}
+        />
+      )}
+      {currentUserId && placeListStatus && (
+        <PlaceList
+          places={places}
+          status={placeListStatus}
+          onSelectPlace={handleSelectPlace}
+          onClose={() => setPlaceListStatus(null)}
+        />
+      )}
       {currentUserId && <TripDetails place={selectedPlace} onClose={() => setSelectedPlace(null)} onUpdateMap={fetchPlaces} />}
       {currentUserId && <AddTripForm newLocation={newLocation} onClose={() => setNewLocation(null)} onSaveSuccess={() => { setNewLocation(null); fetchPlaces(); }} />}
 
@@ -223,7 +363,14 @@ function App() {
       )}
 
       <MapContainer center={[20, 0]} zoom={3} scrollWheelZoom={true} doubleClickZoom={false} style={{ height: "100%", width: "100%", zIndex: 0 }} zoomControl={false}>
-        <MapController searchResult={searchResult} userLocation={userPos} triggerLocate={triggerLocate} setTriggerLocate={setTriggerLocate} onUserLocationFound={setUserPos} />
+        <MapController
+          searchResult={searchResult}
+          userLocation={userPos}
+          triggerLocate={triggerLocate}
+          setTriggerLocate={setTriggerLocate}
+          onUserLocationFound={setUserPos}
+          selectedPlace={selectedPlace}
+        />
 
         {/* ✅ FIX: Pass currentUserId */}
         <MapEventsHandler
