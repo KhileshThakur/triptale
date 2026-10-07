@@ -1,152 +1,347 @@
-import React, { useState, useEffect } from 'react';
-import { FaTimes, FaUser, FaLock, FaTrash, FaEnvelope, FaExclamationTriangle } from 'react-icons/fa';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import React, { useState } from "react";
+import {
+  FaTimes, FaUser, FaLock, FaTrash, FaEnvelope,
+  FaShieldAlt, FaAt, FaInbox
+} from "react-icons/fa";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import GalleryRequests from "./GalleryRequests";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
-const Profile = ({ onClose, currentUser, setCurrentUser, onLogout }) => {
-    const [activeTab, setActiveTab] = useState('general'); // general | security
-    const [loading, setLoading] = useState(false);
-    
-    // User Data
-    const [email] = useState(localStorage.getItem("user_email") || "No Email");
-    const [newUsername, setNewUsername] = useState(currentUser || "");
-    
-    // Password Data
-    const [passData, setPassData] = useState({ oldPassword: '', newPassword: '' });
+const Profile = ({
+  onClose,
+  currentUser,
+  currentUserDisplayName,
+  setCurrentUser,
+  setCurrentUserDisplayName,
+  onLogout
+}) => {
+  const [activeTab, setActiveTab] = useState("general");
+  const [loading, setLoading] = useState(false);
 
-    // 1. Update Username
-    const handleUpdateUsername = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        const userId = localStorage.getItem("user_id");
-        try {
-            const res = await axios.put(`${API_URL}/api/users/update-username`, { userId, newUsername });
-            
-            localStorage.setItem("user_name", res.data.username);
-            setCurrentUser(res.data.username);
-            toast.success("Username updated!");
-        } catch (err) {
-            toast.error("Failed to update username");
-        } finally { setLoading(false); }
-    };
+  const email = localStorage.getItem("user_email") || "No Email";
 
-    // 2. Change Password
-    const handleChangePassword = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        const userId = localStorage.getItem("user_id");
-        try {
-            await axios.post(`${API_URL}/api/users/update-password`, {
-                userId,
-                oldPassword: passData.oldPassword,
-                newPassword: passData.newPassword
-            });
-            toast.success("Password changed successfully!");
-            setPassData({ oldPassword: '', newPassword: '' });
-        } catch (err) {
-            toast.error(err.response?.data || "Error changing password");
-        } finally { setLoading(false); }
-    };
+  const [name, setName] = useState(
+    localStorage.getItem("user_display_name") || currentUserDisplayName || ""
+  );
 
-    // 3. Delete Account
-    const handleDeleteAccount = async () => {
-        if (!window.confirm("Are you sure? This deletes ALL your pins and photos permanently.")) return;
-        setLoading(true);
-        const userId = localStorage.getItem("user_id");
-        try {
-            await axios.delete(`${API_URL}/api/users/delete-account/${userId}`);
-            toast.success("Account deleted. Safe travels!");
-            onClose();
-            onLogout();
-        } catch (err) {
-            toast.error("Failed to delete account");
-            setLoading(false);
+  const [username, setUsername] = useState(currentUser || "");
+
+  const [passData, setPassData] = useState({
+    oldPassword: "",
+    newPassword: ""
+  });
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+
+    if (!name.trim()) {
+      toast.error("Name cannot be empty");
+      return;
+    }
+
+    if (!username.trim()) {
+      toast.error("Username cannot be empty");
+      return;
+    }
+
+    setLoading(true);
+    const userId = localStorage.getItem("user_id");
+
+    try {
+      const nameRes = await axios.put(
+        `${API_URL}/api/users/update-name`,
+        { userId, newName: name.trim() }
+      );
+
+      const usernameRes = await axios.put(
+        `${API_URL}/api/users/update-username`,
+        { userId, newUsername: username.trim() }
+      );
+
+      const updatedUser = usernameRes.data;
+
+      localStorage.setItem("user_display_name", nameRes.data.name);
+      localStorage.setItem("user_name", updatedUser.username);
+
+      setCurrentUser(updatedUser.username);
+
+      if (setCurrentUserDisplayName) {
+        setCurrentUserDisplayName(nameRes.data.name);
+      }
+
+      toast.success("Profile updated successfully!");
+    } catch (err) {
+      toast.error(err.response?.data || "Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+
+    if (!passData.oldPassword || !passData.newPassword) {
+      toast.error("Please fill both password fields");
+      return;
+    }
+
+    setLoading(true);
+    const userId = localStorage.getItem("user_id");
+
+    try {
+      await axios.post(
+        `${API_URL}/api/users/update-password`,
+        {
+          userId,
+          oldPassword: passData.oldPassword,
+          newPassword: passData.newPassword
         }
-    };
+      );
 
-    return (
-        <div className="loginContainer" style={{
-            position: 'absolute', top: 0, left: 0, width: '100%', height: '100vh',
-            background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(5px)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000
-        }}>
-            <div style={{
-                width: '400px', background: 'white', borderRadius: '24px', 
-                boxShadow: '0 20px 60px rgba(0,0,0,0.15)', position: 'relative', overflow: 'hidden',
-                display: 'flex', flexDirection: 'column', maxHeight: '90vh'
-            }}>
-                {/* Header */}
-                <div style={{padding: '20px 25px', background: '#f8f9fa', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-                        <div style={{width:'40px', height:'40px', background:'#333', color:'white', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.2rem'}}><FaUser /></div>
-                        <div>
-                            <h2 style={{margin: 0, fontSize: '1.2rem'}}>{currentUser}</h2>
-                            <span style={{fontSize:'0.8rem', color:'#777'}}>{email}</span>
-                        </div>
-                    </div>
-                    <FaTimes style={{cursor: 'pointer', fontSize: '1.2rem', color: '#888'}} onClick={onClose} />
-                </div>
+      toast.success("Password changed successfully!");
 
-                {/* Tabs */}
-                <div style={{display: 'flex', borderBottom: '1px solid #eee'}}>
-                    <button onClick={() => setActiveTab('general')} style={{flex: 1, padding: '15px', background: activeTab === 'general' ? 'white' : '#f9f9f9', border: 'none', cursor: 'pointer', fontWeight: 600, color: activeTab === 'general' ? 'var(--primary)' : '#888', borderBottom: activeTab === 'general' ? '2px solid var(--primary)' : 'none'}}>General</button>
-                    <button onClick={() => setActiveTab('security')} style={{flex: 1, padding: '15px', background: activeTab === 'security' ? 'white' : '#f9f9f9', border: 'none', cursor: 'pointer', fontWeight: 600, color: activeTab === 'security' ? 'var(--primary)' : '#888', borderBottom: activeTab === 'security' ? '2px solid var(--primary)' : 'none'}}>Security</button>
-                </div>
+      setPassData({
+        oldPassword: "",
+        newPassword: ""
+      });
+    } catch (err) {
+      toast.error(err.response?.data || "Error changing password");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                {/* Content */}
-                <div style={{padding: '30px'}}>
-                    
-                    {activeTab === 'general' && (
-                        <form onSubmit={handleUpdateUsername}>
-                            <div className="form-group">
-                                <label>Display Name</label>
-                                <div style={{position: 'relative'}}>
-                                    <FaUser style={{position: 'absolute', top: '15px', left: '15px', color: '#ccc'}} />
-                                    <input type="text" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} style={{paddingLeft: '40px'}} />
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label>Email Address</label>
-                                <div style={{position: 'relative'}}>
-                                    <FaEnvelope style={{position: 'absolute', top: '15px', left: '15px', color: '#ccc'}} />
-                                    <input type="text" value={email} disabled style={{paddingLeft: '40px', color:'#999', cursor:'not-allowed'}} />
-                                </div>
-                            </div>
-                            <button className="btn-primary" disabled={loading}>{loading ? "Saving..." : "Update Profile"}</button>
-                        </form>
-                    )}
-
-                    {activeTab === 'security' && (
-                        <>
-                            <form onSubmit={handleChangePassword} style={{marginBottom:'30px'}}>
-                                <div className="form-group">
-                                    <label>Change Password</label>
-                                    <div style={{position: 'relative', marginBottom:'10px'}}>
-                                        <FaLock style={{position: 'absolute', top: '15px', left: '15px', color: '#ccc'}} />
-                                        <input type="password" placeholder="Current Password" value={passData.oldPassword} onChange={(e) => setPassData({...passData, oldPassword: e.target.value})} style={{paddingLeft: '40px'}} />
-                                    </div>
-                                    <div style={{position: 'relative'}}>
-                                        <FaLock style={{position: 'absolute', top: '15px', left: '15px', color: '#ccc'}} />
-                                        <input type="password" placeholder="New Password" value={passData.newPassword} onChange={(e) => setPassData({...passData, newPassword: e.target.value})} style={{paddingLeft: '40px'}} />
-                                    </div>
-                                </div>
-                                <button className="btn-primary" disabled={loading}>{loading ? "Updating..." : "Update Password"}</button>
-                            </form>
-
-                            <div style={{borderTop:'1px solid #eee', paddingTop:'20px'}}>
-                                <label style={{color:'#e74c3c'}}>Danger Zone</label>
-                                <button type="button" onClick={handleDeleteAccount} style={{width: '100%', padding: '12px', background: '#fff0f0', color: '#e74c3c', border: '1px solid #e74c3c', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}>
-                                    <FaTrash /> Delete Account
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "Are you sure? This will permanently delete your account, pins and photos."
     );
+
+    if (!confirmed) return;
+
+    setLoading(true);
+    const userId = localStorage.getItem("user_id");
+
+    try {
+      await axios.delete(
+        `${API_URL}/api/users/delete-account/${userId}`
+      );
+
+      toast.success("Account deleted. Safe travels!");
+      onClose();
+      onLogout();
+    } catch (err) {
+      toast.error("Failed to delete account");
+      setLoading(false);
+    }
+  };
+
+  const firstLetter = (name || currentUser || "U")
+    .charAt(0)
+    .toUpperCase();
+
+  return (
+    <div className="profile-overlay">
+      <div className="profile-modal">
+
+        <div className="profile-header">
+          <div className="profile-user">
+            <div className="profile-avatar">{firstLetter}</div>
+
+            <div className="profile-user-info">
+              <h2>{name || "Your Name"}</h2>
+              <span>@{username || "username"}</span>
+            </div>
+          </div>
+
+          <button
+            className="profile-close"
+            onClick={onClose}
+            aria-label="Close profile"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        {/* 3 TABS */}
+        <div className="profile-tabs">
+          <button
+            className={activeTab === "general" ? "active" : ""}
+            onClick={() => setActiveTab("general")}
+          >
+            <FaUser />
+            <span>General</span>
+          </button>
+
+          <button
+            className={activeTab === "security" ? "active" : ""}
+            onClick={() => setActiveTab("security")}
+          >
+            <FaShieldAlt />
+            <span>Security</span>
+          </button>
+
+          <button
+            className={activeTab === "requests" ? "active" : ""}
+            onClick={() => setActiveTab("requests")}
+          >
+            <FaInbox />
+            <span>Requests</span>
+          </button>
+        </div>
+
+        <div className="profile-content">
+
+          {/* GENERAL */}
+          {activeTab === "general" && (
+            <div className="profile-section">
+              <div className="profile-section-title">
+                <h3>Profile Information</h3>
+                <p>
+                  Update your personal information and how people see you on TripTale.
+                </p>
+              </div>
+
+              <form onSubmit={handleUpdateProfile} className="profile-form">
+
+                <div className="profile-field">
+                  <label>Full Name</label>
+                  <div className="profile-input-wrap">
+                    <FaUser />
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your name"
+                    />
+                  </div>
+                </div>
+
+                <div className="profile-field">
+                  <label>Username</label>
+                  <div className="profile-input-wrap">
+                    <FaAt />
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="Enter your username"
+                    />
+                  </div>
+                  <span className="profile-field-hint">
+                    This is how people find you on TripTale.
+                  </span>
+                </div>
+
+                <div className="profile-field">
+                  <label>Email Address</label>
+                  <div className="profile-input-wrap disabled">
+                    <FaEnvelope />
+                    <input type="text" value={email} disabled />
+                  </div>
+                  <span className="profile-field-hint">
+                    Email cannot be changed.
+                  </span>
+                </div>
+
+                <button className="profile-primary-btn" disabled={loading}>
+                  {loading ? "Saving..." : "Save Profile"}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* SECURITY */}
+          {activeTab === "security" && (
+            <div className="profile-section">
+              <div className="profile-section-title">
+                <h3>Security</h3>
+                <p>Keep your TripTale account secure.</p>
+              </div>
+
+              <form onSubmit={handleChangePassword} className="profile-form">
+
+                <div className="profile-field">
+                  <label>Current Password</label>
+                  <div className="profile-input-wrap">
+                    <FaLock />
+                    <input
+                      type="password"
+                      placeholder="Current password"
+                      value={passData.oldPassword}
+                      onChange={(e) =>
+                        setPassData({
+                          ...passData,
+                          oldPassword: e.target.value
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="profile-field">
+                  <label>New Password</label>
+                  <div className="profile-input-wrap">
+                    <FaLock />
+                    <input
+                      type="password"
+                      placeholder="New password"
+                      value={passData.newPassword}
+                      onChange={(e) =>
+                        setPassData({
+                          ...passData,
+                          newPassword: e.target.value
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <button className="profile-primary-btn" disabled={loading}>
+                  {loading ? "Updating..." : "Update Password"}
+                </button>
+              </form>
+
+              <div className="profile-danger">
+                <div>
+                  <h3>Danger Zone</h3>
+                  <p>Permanently delete your TripTale account and data.</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={loading}
+                  className="profile-delete-btn"
+                >
+                  <FaTrash />
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* REQUESTS */}
+          {activeTab === "requests" && (
+            <div className="profile-section">
+              <div className="profile-section-title">
+                <h3>Gallery Requests</h3>
+                <p>
+                  Manage people requesting access to your travel gallery.
+                </p>
+              </div>
+
+              <div className="profile-requests">
+                <GalleryRequests />
+              </div>
+            </div>
+          )}
+
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Profile;

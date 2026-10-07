@@ -6,14 +6,26 @@ const UserSchema = new mongoose.Schema(
       type: String, 
       required: true, 
       min: 3, 
-      max: 20 
-      // unique: true <--- REMOVED: Multiple people can have the same name now
+      max: 20,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      minlength: 3,
+      maxlength: 20,
+    },
+    name: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: 50
     },
     email: { 
       type: String, 
       required: true, 
       max: 50, 
-      unique: true // Email MUST be unique for login
+      unique: true,
+      trim: true,
+      lowercase: true
     },
     password: { 
       type: String, 
